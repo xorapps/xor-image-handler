@@ -289,6 +289,29 @@ impl ImageWithMime {
     pub fn bytes(&self) -> &[u8] {
         self.bytes.as_slice()
     }
+
+    pub fn add_extension(&mut self, extension: &str) -> &mut Self {
+        self.extension = extension.to_owned();
+
+        self
+    }
+
+    pub fn from_memory(&mut self, bytes: Vec<u8>) -> XorResult<&mut Self> {
+        self.bytes = bytes;
+
+        Ok(self)
+    }
+
+    pub fn sanity_check(&self, capacity: u64) -> XorResult<&Self> {
+        if self.bytes.len() as u64 > capacity {
+            return Err(XorError::FileSizeExceeded {
+                capacity_allowed: capacity,
+                size_encountered: self.bytes.len() as u64,
+            });
+        }
+
+        Ok(self)
+    }
 }
 
 impl fmt::Debug for ImageWithMime {
